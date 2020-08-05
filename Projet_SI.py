@@ -1,11 +1,6 @@
-from tqdm import tqdm #baaaaaaarre de chargement
-import cv2 #analyse d'image, le best
-from glob import glob #ça me permet de gérer mes dossiers directement, histoire d'aller chercher les images
-from termcolor import colored, cprint #des petits messages en couleur
-
-import os
-
-#là j'importe tous les trucs pas drôles ( ou drôles selon à qui tu parle)
+from tqdm import tqdm 
+import cv2 
+from glob import glob 
 import keras
 from keras.preprocessing.image import ImageDataGenerator, img_to_array, load_img
 from keras.models import load_model
@@ -17,17 +12,11 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 
 
-#je crée des listes qui vont me permettre de stocker toutes le images
 x_tout = []
 y_tout = []
 
 
-#####################################################
- #là je vais chercher les images et je les manipule #
- #pour que ma RAM n'ait pas de problèmes et que tout#
- #soit sous le même format                          #
-#####################################################
-print('wah des photos de gens faisant des signes chelous')
+print('all good')
 img_porte = glob(r'dataset_SI/O_2/*')
 img_lampe = glob(r'dataset_SI/L_2/*')
 img_aucun_signe = glob(r'dataset_SI/aucun_bg/*')
@@ -91,54 +80,38 @@ for image in tqdm(img_lampe) :
 
 print ('tout fonctionne')
 
-#ici les images sont mélangées
 
 x_tout, y_tout = shuffle(x_tout, y_tout)
 
-#je transforme les listes précédentes en array pour qu'elles soient lues
 
 x_tout = np.asarray(x_tout)
 y_tout = np.asarray(y_tout)
-
-#ici je transforme les "labels" en matrice ce qui me
-#permet d'associer une erreur à chaque signe
-
 
 y_tout = keras.utils.to_categorical(y_tout, 5)
 
 
 
 
-#####################################
-#l'entraînement du modèle commence  #
-#####################################
 
 
-# ici la photo est stockée dans x_tout, et l'information du signe dans y_tout
-# maintenant on va séparer x_tout et y_tout en train et test
-# les images de train permettent d'entrainer alors que celles de test permettent de tester
-
-
+#verifying shape just to be sure
 x_train , x_test , y_train, y_test = train_test_split(x_tout, y_tout, test_size= 0.10)
-print ("X train : " + str(x_train.shape))  #je regarde cb il y a d'images dans chaque trucs
+print ("X train : " + str(x_train.shape))  
 print ("Y train : " + str(y_train.shape))
 print ("X test : " + str(x_test.shape))
 print ("Y test : " + str(y_test.shape))
 
 
-#ça me permet de rajouter une dimension à mon array  pour dire que c'est noir et blanc
+
 x_train = np.expand_dims(x_train,3)
 x_test = np.expand_dims(x_test,3)
 
-
-#ici je définis les paramètres du modèle qui s'organise en plusieurs couches
+#model with tests to optimize
 
 model=Sequential()
 model.add(Conv2D(64,(3,3), input_shape=(100,100,1)))  #je définis le format de l'image
 model.add(Activation("relu"))
 
-#j'utilise un modèle avec des couches de convoltion car c'est le meilleures
-#en analyse d'image
 
 model.add(MaxPooling2D(pool_size=(2,2)))
 
@@ -154,8 +127,7 @@ model.add(Activation("relu"))
 model.add(Conv2D(64,(3,3)))
 model.add(Activation("relu"))
 
-#ici j'ajoute une couche qui permet "d'aplatir" les images
-#afin que le programme les lisent en suite de nombres
+
 model.add(Flatten())
 
 
@@ -163,14 +135,14 @@ model.add(Flatten())
 model.add(Dense(64,activation='relu'))
 model.add (Dense(5,activation='softmax'))
 
-#la dernière couche a 5 neurones car chacune donne la probabilité d'un résultat
+
 
 
 model.summary()
 
-model.compile(loss="categorical_crossentropy", #la fonction qui venait avec to_categorical
+model.compile(loss="categorical_crossentropy", 
 	optimizer = Adam(lr=1e-6),
-	metrics=["accuracy"]) #analyse la précision du programme
+	metrics=["accuracy"]) 
 
 model.fit(x_train,y_train,
 epochs = 7,
