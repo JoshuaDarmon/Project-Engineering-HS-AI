@@ -161,11 +161,9 @@ verbose = 1)
 
 #model.fit_generator(image_gen.flow(x_train,y_train,batch_size = 32),
     #steps_per_epoch=len(x_train),
-    #epochs=30,      #peut être augmenter
-    #validation_data=(x_test, y_test),   #avec quoi il va verifier
+    #epochs=30,     
+    #validation_data=(x_test, y_test),   
     #verbose=1)
 
-#nuuuuu on a fini
-#faut pas oublier de sauvegarder parce que sinon c'est la PLS
 
 model.save('model_projet_SI_V2_noBG_2.h5')
